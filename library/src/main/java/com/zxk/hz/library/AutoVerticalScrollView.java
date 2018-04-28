@@ -19,7 +19,6 @@ import android.widget.ScrollView;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Logger;
 
 /**
  * 　　┏┓　　　　┏┓
@@ -78,7 +77,7 @@ public class AutoVerticalScrollView extends ScrollView {
         mChildHeight = getMeasuredHeight() / mLimit;
         Log.e("TAG", "mChildHeight=" + mChildHeight);
         mParentLayout = new LinearLayout(context);
-        mParentLayout.setBackgroundColor(0xffacbdca);
+        mParentLayout.setBackgroundColor(0xffabdca0);
         mParentLayout.setOrientation(LinearLayout.VERTICAL);
         mParentLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         addView(mParentLayout);
@@ -89,6 +88,7 @@ public class AutoVerticalScrollView extends ScrollView {
             Log.e("TAG", "mAdapter.count=" + mAdapter.itemCount());
             mParentLayout.removeAllViews();
             int count = mAdapter.itemCount();
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, mChildHeight);
             if (count > mLimit) {
                 mIsAutoScroll = true; //如果总数大于limt数，开启自动滚动
                 for (int i = 0; i < mLimit; i++) {
@@ -100,6 +100,7 @@ public class AutoVerticalScrollView extends ScrollView {
                         v1 = mAdapter.getView((mCurrentIndex - (mLimit - i)) % count);
                     }
                     if (v1 != null) {
+                        v1.setLayoutParams(layoutParams);
                         mParentLayout.addView(v1);
                     }
                 }
@@ -109,9 +110,22 @@ public class AutoVerticalScrollView extends ScrollView {
                 mIsAutoScroll = false;
                 for (int i = 0; i < count; i++) {
                     View v1 = mAdapter.getView(i);
+                    v1.setLayoutParams(layoutParams);
                     mParentLayout.addView(v1);
                 }
             }
+        }
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        super.onLayout(changed, l, t, r, b);
+        Log.d("TAG", "changed=" + changed);
+        Log.d("TAG", "height=" + getHeight());
+        if (changed) {
+            Log.d("TAG", "count=" + getChildCount());
+            mChildHeight = getHeight() / mLimit;
+            setView();
         }
     }
 
@@ -132,6 +146,8 @@ public class AutoVerticalScrollView extends ScrollView {
                             mCurrentIndex = mLimit;
                         }
                         View v = mAdapter.getView(mCurrentIndex % mAdapter.itemCount());
+                        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, mChildHeight);
+                        v.setLayoutParams(layoutParams);
                         mParentLayout.addView(v);
                         //记录下一条滚动index
                         mCurrentIndex++;
@@ -232,7 +248,8 @@ public class AutoVerticalScrollView extends ScrollView {
         if (mAdapter != null) {
             mAdapter.registerAdapterDataObserver(mObserver);
         }
-        setView();
+//        setView();
+        requestLayout();
     }
 
     public void setLimit(int limit) {
@@ -274,7 +291,8 @@ public class AutoVerticalScrollView extends ScrollView {
     private class AdapterDataObserver {
         public void onChange() {
             //Do nothing
-            setView();
+//            setView();
+            requestLayout();
         }
 
     }

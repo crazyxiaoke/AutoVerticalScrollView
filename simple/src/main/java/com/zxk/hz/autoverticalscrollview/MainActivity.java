@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         autoVerticalScrollView = findViewById(R.id.autoverticalScrollView);
-        autoVerticalScrollView.setLimit(3);
+        autoVerticalScrollView.setLimit(2);
         testAdapter = new TestAdapter(this);
         autoVerticalScrollView.setAdapter(testAdapter);
         initData();
